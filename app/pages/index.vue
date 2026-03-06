@@ -56,14 +56,7 @@
 </template>
 
 <script setup lang="ts">
-const code = ref(`// Ejemplo de código en español
-crear nombre = "Mundo"
-crear edad = 25
-imprimir("Hola " + nombre)
-si (edad > 18) {
-  imprimir("Eres mayor de edad")
-}
-`)
+const code = ref('')
 
 const { tokens, errors, ast, analyze: runAnalyze } = useCompiler()
 const isAnalyzing = ref(false)
@@ -101,10 +94,6 @@ mientras (contador < 3) {
   crear contador = contador + 1
 }
 `
-  analyze()
+  nextTick(() => analyze())
 }
-
-onMounted(() => {
-  analyze()
-})
 </script>
