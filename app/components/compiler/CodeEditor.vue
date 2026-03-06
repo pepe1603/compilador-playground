@@ -1,10 +1,11 @@
 <template>
-  <div ref="editorRef" class="w-full h-full border rounded-lg" />
+  <ClientOnly>
+    <div ref="editorRef" class="w-full h-full border rounded-lg" />
+  </ClientOnly>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
-import * as monaco from 'monaco-editor'
 
 const props = defineProps<{
   modelValue: string
@@ -15,10 +16,21 @@ const emit = defineEmits<{
 }>()
 
 const editorRef = ref<HTMLElement>()
-let editor: monaco.editor.IStandaloneCodeEditor
+let editor: any = null
 
-onMounted(() => {
-  if (editorRef.value) {
+onMounted(async () => {
+  if (import.meta.client && editorRef.value) {
+    const monaco = await import('monaco-editor')
+    
+    self.MonacoEnvironment = {
+      getWorker: function () {
+        return new Worker(
+          new URL('monaco-editor/esm/vs/editor/editor.worker.js', import.meta.url),
+          { type: 'module' }
+        )
+      }
+    }
+
     editor = monaco.editor.create(editorRef.value, {
       value: props.modelValue,
       language: 'javascript',
