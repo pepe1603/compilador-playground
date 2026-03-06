@@ -1,38 +1,37 @@
 import { Lexer } from '~/compiler/lexer'
-import type { Token, CompilerError } from '~/compiler/types'
+import { Parser } from '~/compiler/parser'
+import type { Token, CompilerError, Program } from '~/compiler/types'
 
 export const useCompiler = () => {
   const tokens = ref<Token[]>([])
   const errors = ref<CompilerError[]>([])
-  const ast = ref<any>(null)
+  const ast = ref<Program | null>(null)
   const generatedCode = ref<string>('')
 
   const analyze = (code: string) => {
-    // Análisis Léxico
     const lexer = new Lexer(code)
-    const result = lexer.tokenize()
-    tokens.value = result.tokens
-    errors.value = result.errors
+    const lexerResult = lexer.tokenize()
+    tokens.value = lexerResult.tokens
+    errors.value = lexerResult.errors
 
-    // Aquí irá el parser
-    // if (errors.value.length === 0) {
-    //   const parser = new Parser(tokens.value)
-    //   ast.value = parser.parse()
-    // }
+    if (errors.value.length === 0) {
+      const parser = new Parser(tokens.value)
+      const parseResult = parser.parse()
+      ast.value = parseResult.ast
+      errors.value = [...errors.value, ...parseResult.errors]
+    } else {
+      ast.value = null
+    }
   }
 
   const generate = (code: string) => {
-    // Aquí irá el generador de código
-    // if (ast.value) {
-    //   const generator = new Generator()
-    //   generatedCode.value = generator.generate(ast.value)
-    // }
+    if (ast.value) {
+      generatedCode.value = JSON.stringify(ast.value, null, 2)
+    }
   }
 
   const run = (code: string) => {
-    // Ejecutar el código generado
     try {
-      // Por ahora solo eval
       const result = eval(code)
       return { success: true, output: result }
     } catch (error) {

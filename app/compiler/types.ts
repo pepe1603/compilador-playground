@@ -18,26 +18,101 @@ export interface Token {
   column: number;
 }
 
-export interface ASTNode {
-  type: string;
-  [key: string]: any;
-}
+export type ASTNode =
+  | Program
+  | VariableDeclaration
+  | FunctionDeclaration
+  | IfStatement
+  | WhileStatement
+  | PrintStatement
+  | ReturnStatement
+  | ExpressionStatement
+  | BlockStatement
+  | BinaryExpression
+  | UnaryExpression
+  | Identifier
+  | Literal;
 
-export interface Program extends ASTNode {
+export interface Program {
   type: 'Program';
   body: ASTNode[];
 }
 
-export interface VariableDeclaration extends ASTNode {
+export interface VariableDeclaration {
   type: 'VariableDeclaration';
   name: string;
   value: Expression;
 }
 
-export interface Expression extends ASTNode {
-  type: 'Expression';
-  // ... más tipos
+export interface FunctionDeclaration {
+  type: 'FunctionDeclaration';
+  name: string;
+  params: string[];
+  body: ASTNode[];
 }
+
+export interface IfStatement {
+  type: 'IfStatement';
+  condition: Expression;
+  consequent: ASTNode[];
+  alternate: ASTNode[] | null;
+}
+
+export interface WhileStatement {
+  type: 'WhileStatement';
+  condition: Expression;
+  body: ASTNode[];
+}
+
+export interface PrintStatement {
+  type: 'PrintStatement';
+  argument: Expression;
+  newline: boolean;
+}
+
+export interface ReturnStatement {
+  type: 'ReturnStatement';
+  argument: Expression | null;
+}
+
+export interface ExpressionStatement {
+  type: 'ExpressionStatement';
+  expression: Expression;
+}
+
+export interface BlockStatement {
+  type: 'BlockStatement';
+  body: ASTNode[];
+}
+
+export interface BinaryExpression {
+  type: 'BinaryExpression';
+  operator: string;
+  left: Expression;
+  right: Expression;
+}
+
+export interface UnaryExpression {
+  type: 'UnaryExpression';
+  operator: string;
+  argument: Expression;
+}
+
+export interface Identifier {
+  type: 'Identifier';
+  name: string;
+}
+
+export interface Literal {
+  type: 'Literal';
+  value: LiteralValue;
+}
+
+export type Expression =
+  | BinaryExpression
+  | UnaryExpression
+  | Identifier
+  | Literal;
 
 export interface CompilerError {
   line: number;
