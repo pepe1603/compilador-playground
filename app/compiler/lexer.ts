@@ -1,4 +1,4 @@
-import { Token, TokenType, CompilerError } from './types';
+import type { Token, TokenType, CompilerError } from './types';
 
 export class Lexer {
   private input: string;
@@ -7,8 +7,11 @@ export class Lexer {
   private column: number = 1;
   private errors: CompilerError[] = [];
 
-  // Palabras clave en español
-  private keywords = new Set(['crear', 'imprimir', 'si', 'sino', 'repetir', 'verdadero', 'falso']);
+  private keywords = new Set([
+    'crear', 'imprimir', 'si', 'sino', 'repetir', 
+    'mientras', 'funcion', 'retornar', 'verdadero', 
+    'falso', 'imprimirnl', 'y', 'o', 'no'
+  ]);
 
   constructor(input: string) {
     this.input = input;
@@ -18,39 +21,49 @@ export class Lexer {
     const tokens: Token[] = [];
 
     while (this.position < this.input.length) {
-      const char = this.input[this.position];
+      const char = this.charAt(this.position);
 
-      // Saltar espacios
-      if (/\s/.test(char)) {
-        this.handleWhitespace();
+      if (char === '\n') {
+        this.newLine();
         continue;
       }
 
-      // Números
+      if (/\s/.test(char)) {
+        this.column++;
+        this.position++;
+        continue;
+      }
+
+      if (char === '/' && this.peek(1) === '/') {
+        tokens.push(this.readComment());
+        continue;
+      }
+
       if (/\d/.test(char)) {
         tokens.push(this.readNumber());
         continue;
       }
 
-      // Strings
-      if (char === '"') {
-        tokens.push(this.readString());
+      if (char === '"' || char === "'") {
+        tokens.push(this.readString(char));
         continue;
       }
 
-      // Identificadores y keywords
-      if (/[a-zA-Z_]/ .test(char)) {
-        tokens.push(this.readIdentifier());
+      if (/[a-zA-Z_]/.test(char)) {
+        tokens.push(this.readIdentifierOrKeyword());
         continue;
       }
 
-      // Operadores y puntuación
-      if (this.isOperator(char)) {
+      if (this.isOperatorStart(char)) {
         tokens.push(this.readOperator());
         continue;
       }
 
-      // Si llegamos aquí, es un caracter no reconocido
+      if (this.isPunctuation(char)) {
+        tokens.push(this.readPunctuation());
+        continue;
+      }
+
       this.errors.push({
         line: this.line,
         column: this.column,
@@ -61,7 +74,6 @@ export class Lexer {
       this.column++;
     }
 
-    // Agregar token EOF
     tokens.push({
       type: 'EOF',
       value: 'EOF',
@@ -72,81 +84,118 @@ export class Lexer {
     return { tokens, errors: this.errors };
   }
 
-  private readNumber(): Token {
+  private newLine(): void {
+    this.line++;
+    this.column = 1;
+    this.position++;
+  }
+
+  private readComment(): Token {
+    const startLine = this.line;
     const startColumn = this.column;
     let value = '';
 
-    while (this.position < this.input.length && /[\d.]/.test(this.input[this.position])) {
+    this.position += 2;
+    this.column += 2;
+
+    while (this.position < this.input.length && this.input[this.position] !== '\n') {
       value += this.input[this.position];
       this.position++;
       this.column++;
     }
 
-    return {
-      type: 'NUMBER',
-      value,
-      line: this.line,
-      column: startColumn
-    };
+    return { type: 'COMMENT', value, line: startLine, column: startColumn };
   }
 
-  private readString(): Token {
+  private readNumber(): Token {
     const startColumn = this.column;
-    let value = '"';
+    let value = '';
+    let hasDecimal = false;
+
+    while (this.position < this.input.length) {
+      const char = this.charAt(this.position);
+      if (/\d/.test(char)) {
+        value += char;
+        this.position++;
+        this.column++;
+      } else if (char === '.' && !hasDecimal) {
+        hasDecimal = true;
+        value += char;
+        this.position++;
+        this.column++;
+      } else {
+        break;
+      }
+    }
+
+    return { type: 'NUMBER', value, line: this.line, column: startColumn };
+  }
+
+  private readString(quote: string): Token {
+    const startColumn = this.column;
+    let value = quote;
     this.position++;
     this.column++;
 
-    while (this.position < this.input.length && this.input[this.position] !== '"') {
+    while (this.position < this.input.length && this.input[this.position] !== quote) {
+      if (this.input[this.position] === '\n') {
+        this.errors.push({
+          line: this.line,
+          column: this.column,
+          message: 'String no cerrado',
+          type: 'lexical'
+        });
+        break;
+      }
       value += this.input[this.position];
       this.position++;
       this.column++;
     }
 
     if (this.position < this.input.length) {
-      value += '"';
+      value += quote;
       this.position++;
       this.column++;
     }
 
-    return {
-      type: 'STRING',
-      value,
-      line: this.line,
-      column: startColumn
-    };
+    return { type: 'STRING', value, line: this.line, column: startColumn };
   }
 
-  private readIdentifier(): Token {
+  private readIdentifierOrKeyword(): Token {
     const startColumn = this.column;
     let value = '';
 
-    while (this.position < this.input.length && /[a-zA-Z0-9_]/.test(this.input[this.position])) {
-      value += this.input[this.position];
+    while (this.position < this.input.length && /[a-zA-Z0-9_]/.test(this.charAt(this.position))) {
+      value += this.charAt(this.position);
       this.position++;
       this.column++;
     }
 
     const type = this.keywords.has(value) ? 'KEYWORD' : 'IDENTIFIER';
 
-    return {
-      type,
-      value,
-      line: this.line,
-      column: startColumn
-    };
+    if (value === 'verdadero') {
+      return { type: 'BOOLEAN', value: 'true', line: this.line, column: startColumn };
+    }
+    if (value === 'falso') {
+      return { type: 'BOOLEAN', value: 'false', line: this.line, column: startColumn };
+    }
+
+    return { type, value, line: this.line, column: startColumn };
   }
 
   private readOperator(): Token {
     const startColumn = this.column;
-    let value = this.input[this.position];
+    let value = this.charAt(this.position);
 
-    // Operadores de dos caracteres
-    if (value === '=' && this.input[this.position + 1] === '=') {
-      value = '==';
-      this.position += 2;
-      this.column += 2;
-    } else if (value === '!' && this.input[this.position + 1] === '=') {
-      value = '!=';
+    const twoCharOps: Record<string, string> = {
+      '==': '==', '!=': '!=', '&&': '&&', '||': '||',
+      '<=': '<=', '>=': '>=', '+=': '+=', '-=': '-=',
+      '*=': '*=', '/=': '/='
+    };
+
+    const twoChar = value + (this.input[this.position + 1] || '');
+    if (twoCharOps[twoChar]) {
+      value = twoChar;
       this.position += 2;
       this.column += 2;
     } else {
@@ -154,27 +203,34 @@ export class Lexer {
       this.column++;
     }
 
-    return {
-      type: 'OPERATOR',
-      value,
+    return { type: 'OPERATOR', value, line: this.line, column: startColumn };
+  }
+
+  private readPunctuation(): Token {
+    const token: Token = {
+      type: 'PUNCTUATION',
+      value: this.charAt(this.position),
       line: this.line,
-      column: startColumn
+      column: this.column
     };
+    this.position++;
+    this.column++;
+    return token;
   }
 
-  private handleWhitespace(): void {
-    while (this.position < this.input.length && /\s/.test(this.input[this.position])) {
-      if (this.input[this.position] === '\n') {
-        this.line++;
-        this.column = 1;
-      } else {
-        this.column++;
-      }
-      this.position++;
-    }
+  private peek(offset: number): string {
+    return this.input[this.position + offset] ?? '';
   }
 
-  private isOperator(char: string): boolean {
-    return ['=', '+', '-', '*', '/', '>', '<', '!', '(', ')', '{', '}', ';', ','].includes(char);
+  private charAt(pos: number): string {
+    return this.input[pos] ?? '';
+  }
+
+  private isOperatorStart(char: string): boolean {
+    return ['=', '+', '-', '*', '/', '>', '<', '!', '&', '|'].includes(char);
+  }
+
+  private isPunctuation(char: string): boolean {
+    return ['(', ')', '{', '}', '[', ']', ';', ',', ':'].includes(char);
   }
 }

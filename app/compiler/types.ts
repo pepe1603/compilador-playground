@@ -1,12 +1,15 @@
 export type TokenType =
-  | 'KEYWORD'      // crear, imprimir, si, repetir
-  | 'IDENTIFIER'    // nombre variables
-  | 'NUMBER'       // 123, 45.67
-  | 'STRING'       // "hola mundo"
-  | 'BOOLEAN'      // verdadero, falso
-  | 'OPERATOR'     // =, +, -, *, /, >, <
-  | 'PUNCTUATION'  // ( ) { } ; ,
+  | 'KEYWORD'       // crear, imprimir, si, sino, repetir, mientras, funcion, retornar
+  | 'IDENTIFIER'    // nombre de variables
+  | 'NUMBER'        // 123, 45.67
+  | 'STRING'        // "hola mundo"
+  | 'BOOLEAN'       // verdadero, falso
+  | 'OPERATOR'      // =, +, -, *, /, >, <, ==, !=, &&, ||
+  | 'PUNCTUATION'   // ( ) { } ; , 
+  | 'COMMENT'       // // comentario
   | 'EOF';
+
+export type LiteralValue = string | number | boolean | null;
 
 export interface Token {
   type: TokenType;

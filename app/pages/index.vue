@@ -1,76 +1,96 @@
 <template>
-  <div>
-    <UPageHero
-      title="Nuxt Starter Template"
-      description="A production-ready starter template powered by Nuxt UI. Build beautiful, accessible, and performant applications in minutes, not hours."
-      :links="[{
-        label: 'Get started',
-        to: 'https://ui.nuxt.com/docs/getting-started/installation/nuxt',
-        target: '_blank',
-        trailingIcon: 'i-lucide-arrow-right',
-        size: 'xl'
-      }, {
-        label: 'Use this template',
-        to: 'https://github.com/nuxt-ui-templates/starter',
-        target: '_blank',
-        icon: 'i-simple-icons-github',
-        size: 'xl',
-        color: 'neutral',
-        variant: 'subtle'
-      }]"
-    />
+  <div class="min-h-screen bg-gray-900 text-white p-4">
+    <div class="max-w-7xl mx-auto">
+      <div class="mb-6 flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-primary-400">Compilador Playground</h1>
+          <p class="text-gray-400">Aprende cómo funciona un compilador</p>
+        </div>
+        <div class="flex gap-2">
+          <UBadge color="info" variant="subtle">Fase 1: Lexer</UBadge>
+        </div>
+      </div>
 
-    <UPageSection
-      id="features"
-      title="Everything you need to build modern Nuxt apps"
-      description="Start with a solid foundation. This template includes all the essentials for building production-ready applications with Nuxt UI's powerful component system."
-      :features="[{
-        icon: 'i-lucide-rocket',
-        title: 'Production-ready from day one',
-        description: 'Pre-configured with TypeScript, ESLint, Tailwind CSS, and all the best practices. Focus on building features, not setting up tooling.'
-      }, {
-        icon: 'i-lucide-palette',
-        title: 'Beautiful by default',
-        description: 'Leveraging Nuxt UI\'s design system with automatic dark mode, consistent spacing, and polished components that look great out of the box.'
-      }, {
-        icon: 'i-lucide-zap',
-        title: 'Lightning fast',
-        description: 'Optimized for performance with SSR/SSG support, automatic code splitting, and edge-ready deployment. Your users will love the speed.'
-      }, {
-        icon: 'i-lucide-blocks',
-        title: '100+ components included',
-        description: 'Access Nuxt UI\'s comprehensive component library. From forms to navigation, everything is accessible, responsive, and customizable.'
-      }, {
-        icon: 'i-lucide-code-2',
-        title: 'Developer experience first',
-        description: 'Auto-imports, hot module replacement, and TypeScript support. Write less boilerplate and ship more features.'
-      }, {
-        icon: 'i-lucide-shield-check',
-        title: 'Built for scale',
-        description: 'Enterprise-ready architecture with proper error handling, SEO optimization, and security best practices built-in.'
-      }]"
-    />
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="space-y-4">
+          <div class="bg-gray-800 rounded-lg p-4">
+            <h2 class="text-lg font-semibold mb-2">Código Fuente</h2>
+            <CompilerCodeEditor v-model="code" class="h-80" />
+          </div>
+          
+          <div class="flex gap-2">
+            <UButton color="primary" @click="analyze" :loading="isAnalyzing">
+              Analizar Léxico
+            </UButton>
+            <UButton color="neutral" variant="outline" @click="loadExample">
+              Cargar Ejemplo
+            </UButton>
+          </div>
+        </div>
 
-    <UPageSection>
-      <UPageCTA
-        title="Ready to build your next Nuxt app?"
-        description="Join thousands of developers building with Nuxt and Nuxt UI. Get this template and start shipping today."
-        variant="subtle"
-        :links="[{
-          label: 'Start building',
-          to: 'https://ui.nuxt.com/docs/getting-started/installation/nuxt',
-          target: '_blank',
-          trailingIcon: 'i-lucide-arrow-right',
-          color: 'neutral'
-        }, {
-          label: 'View on GitHub',
-          to: 'https://github.com/nuxt-ui-templates/starter',
-          target: '_blank',
-          icon: 'i-simple-icons-github',
-          color: 'neutral',
-          variant: 'outline'
-        }]"
-      />
-    </UPageSection>
+        <div class="space-y-4">
+          <div class="bg-gray-800 rounded-lg p-4">
+            <h2 class="text-lg font-semibold mb-2">Tokens</h2>
+            <CompilerTokenViewer :tokens="tokens" />
+          </div>
+
+          <div v-if="errors.length > 0" class="bg-red-900/30 border border-red-500 rounded-lg p-4">
+            <h3 class="text-red-400 font-semibold mb-2">Errores Léxicos</h3>
+            <ul class="space-y-1">
+              <li v-for="(error, i) in errors" :key="i" class="text-red-300 text-sm">
+                Línea {{ error.line }}:{{ error.column }} - {{ error.message }}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
+
+<script setup lang="ts">
+const code = ref(`// Ejemplo de código en español
+crear nombre = "Mundo"
+crear edad = 25
+imprimir("Hola " + nombre)
+si (edad > 18) {
+  imprimir("Eres mayor de edad")
+}
+`)
+
+const { tokens, errors, analyze: runAnalyze } = useCompiler()
+const isAnalyzing = ref(false)
+
+const analyze = async () => {
+  isAnalyzing.value = true
+  await nextTick()
+  runAnalyze(code.value)
+  isAnalyzing.value = false
+}
+
+const loadExample = () => {
+  code.value = `// Ejemplo: Calculadora simple
+crear a = 10
+crear b = 5
+crear suma = a + b
+crear producto = a * b
+
+imprimir("Suma: " + suma)
+imprimir("Producto: " + producto)
+
+si (suma > producto) {
+  imprimir("La suma es mayor")
+} sino {
+  producto("El producto es mayor")
+}
+
+// Comentario de una línea
+crear esMayor = verdadero
+`
+  analyze()
+}
+
+onMounted(() => {
+  analyze()
+})
+</script>
