@@ -1,181 +1,87 @@
 <template>
-  <div class="min-h-screen bg-gray-900 text-white p-4">
-    <div class="max-w-7xl mx-auto">
-      <div class="mb-6 flex items-center justify-between">
-        <div>
-          <h1 class="text-3xl font-bold text-primary-400">Compilador Playground</h1>
-          <p class="text-gray-400">Aprende cómo funciona un compilador</p>
-        </div>
-        <div class="flex gap-2">
-          <UBadge color="success" variant="subtle">Fase 4: Intérprete</UBadge>
-        </div>
+  <div class="min-h-screen bg-black flex items-center justify-center relative overflow-hidden">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-purple-900/20 via-black to-black"></div>
+    
+    <div class="text-center z-10 p-8">
+      <h1 class="text-6xl md:text-8xl font-bold mb-4">
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 animate-pulse">
+          COMPILADOR
+        </span>
+      </h1>
+      <h2 class="text-4xl md:text-6xl font-bold mb-8">
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500">
+          PLAYGROUND
+        </span>
+      </h2>
+      
+      <p class="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
+        Aprende cómo funciona un compilador desde cero
+      </p>
+      
+      <div class="flex flex-col md:flex-row gap-4 justify-center">
+        <UButton size="xl" color="primary" variant="solid" @click="$emit('start')">
+          <UIcon name="i-lucide-code" class="mr-2" />
+          Comenzar
+        </UButton>
+        <UButton size="xl" color="neutral" variant="outline" to="https://github.com/pepe1603/compilador-playground" target="_blank">
+          <UIcon name="i-simple-icons-github" class="mr-2" />
+          GitHub
+        </UButton>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div class="space-y-4">
-          <div class="bg-gray-800 rounded-lg p-4">
-            <h2 class="text-lg font-semibold mb-2">Código Fuente</h2>
-            <ClientOnly>
-              <CompilerCodeEditor v-model="code" />
-              <template #fallback>
-                <div class="w-full h-80 bg-gray-700 rounded-lg flex items-center justify-center">
-                  <span class="text-gray-400">Cargando editor...</span>
-                </div>
-              </template>
-            </ClientOnly>
-          </div>
-          
-          <div class="flex gap-2 flex-wrap">
-            <UButton color="primary" size="lg" @click="runCode" :loading="isRunning">
-              <UIcon name="i-lucide-play" class="mr-2" />
-              Run
-            </UButton>
-            <UButton color="neutral" variant="outline" @click="loadExample">
-              Ejemplo Válido
-            </UButton>
-            <UButton color="error" variant="outline" @click="loadErrorExample">
-              Ejemplo con Error
-            </UButton>
-          </div>
-
-          <div class="bg-gray-800 rounded-lg p-4">
-            <h2 class="text-lg font-semibold mb-2">
-              <UIcon name="i-lucide-terminal" class="mr-2" />
-              Output
-            </h2>
-            <CompilerConsoleOutput :output="output" />
-          </div>
+      <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
+        <div class="text-center">
+          <div class="text-3xl mb-2">🔤</div>
+          <div class="text-purple-400 font-bold">Lexer</div>
+          <div class="text-gray-500 text-sm">Análisis Léxico</div>
         </div>
-
-        <div class="space-y-4">
-          <div class="bg-gray-800 rounded-lg p-4">
-            <div class="flex gap-2 mb-4">
-              <UButton 
-                :color="activeTab === 'errores' ? 'primary' : 'neutral'" 
-                variant="soft"
-                @click="activeTab = 'errores'"
-              >
-                <UIcon name="i-lucide-alert-triangle" class="mr-2" />
-                Errores
-                <UBadge v-if="errors.length > 0" color="error" variant="solid" class="ml-2">
-                  {{ errors.length }}
-                </UBadge>
-              </UButton>
-              <UButton 
-                :color="activeTab === 'ast' ? 'primary' : 'neutral'" 
-                variant="soft"
-                @click="activeTab = 'ast'"
-              >
-                <UIcon name="i-lucide-file-code" class="mr-2" />
-                AST
-              </UButton>
-            </div>
-
-            <div v-if="activeTab === 'errores'">
-              <div v-if="errors.length > 0" class="space-y-2">
-                <div v-for="(error, i) in errors" :key="i" class="bg-red-900/30 border border-red-500 rounded p-3 text-red-300">
-                  <UBadge :color="getErrorColor(error.type)" variant="solid" class="mr-2 mb-1">
-                    {{ error.type }}
-                  </UBadge>
-                  <br>
-                  <span class="text-sm">Línea {{ error.line }}:{{ error.column }}</span>
-                  <br>
-                  <span class="font-semibold">{{ error.message }}</span>
-                </div>
-              </div>
-              <div v-else class="text-green-400 text-center py-8">
-                <UIcon name="i-lucide-check-circle" class="text-4xl mb-2" />
-                <p>No hay errores - Código válido</p>
-              </div>
-            </div>
-
-            <div v-else>
-              <CompilerAstViewer :ast="ast" />
-            </div>
-          </div>
+        <div class="text-center">
+          <div class="text-3xl mb-2">📝</div>
+          <div class="text-pink-400 font-bold">Parser</div>
+          <div class="text-gray-500 text-sm">Análisis Sintáctico</div>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl mb-2">🔍</div>
+          <div class="text-cyan-400 font-bold">Semantic</div>
+          <div class="text-gray-500 text-sm">Análisis Semántico</div>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl mb-2">⚡</div>
+          <div class="text-green-400 font-bold">Runtime</div>
+          <div class="text-gray-500 text-sm">Ejecución</div>
         </div>
       </div>
+    </div>
+
+    <div class="absolute bottom-4 text-gray-600 text-sm">
+      Presiona <kbd class="bg-gray-800 px-2 py-1 rounded">Enter</kbd> para comenzar
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-const code = ref('')
+defineEmits<{
+  (e: 'start'): void
+}>()
 
-const { errors, ast, output, run: runCompiler } = useCompiler()
-const isRunning = ref(false)
-const activeTab = ref<'errores' | 'ast'>('errores')
-
-const getErrorColor = (type: string): 'error' | 'warning' | 'info' => {
-  if (type === 'lexical') return 'error'
-  if (type === 'syntactic') return 'warning'
-  return 'error'
-}
-
-const runCode = async () => {
-  if (!code.value.trim()) {
-    alert('Por favor ingresa código antes de ejecutar')
-    return
+onMounted(() => {
+  const handler = (e: KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      navigateTo('/compiler')
+    }
   }
-  isRunning.value = true
-  await nextTick()
-  await new Promise(resolve => setTimeout(resolve, 100))
-  runCompiler(code.value)
-  isRunning.value = false
-}
-
-const loadExample = () => {
-  code.value = `// Ejemplo: Hola Mundo
-imprimir("Hola Mundo")
-
-// Variables y operaciones
-crear nombre = "Juan"
-crear edad = 25
-
-// Operaciones aritméticas
-crear a = 10
-crear b = 5
-crear suma = a + b
-crear resta = a - b
-crear producto = a * b
-crear division = a / b
-
-// Mostrar resultados
-imprimir("Nombre: " + nombre)
-imprimir("Edad: " + edad)
-imprimir("Suma: " + suma)
-imprimir("Resta: " + resta)
-imprimir("Producto: " + producto)
-imprimir("Division: " + division)
-
-// Condicional
-si (edad >= 18) {
-  imprimir("Eres mayor de edad")
-} sino {
-  imprimir("Eres menor de edad")
-}
-
-// Bucle
-crear contador = 0
-mientras (contador < 3) {
-  imprimir("Contador: " + contador)
-  crear contador = contador + 1
-}
-`
-  nextTick(() => {
-    setTimeout(() => runCode(), 300)
-  })
-}
-
-const loadErrorExample = () => {
-  code.value = `// Ejemplo de errores
-// =====================
-
-// Error: Variable no declarada
-imprimir(variableNoDeclarada)
-`
-  nextTick(() => {
-    setTimeout(() => runCode(), 300)
-  })
-}
+  window.addEventListener('keydown', handler)
+  onUnmounted(() => window.removeEventListener('keydown', handler))
+})
 </script>
+
+<style scoped>
+@keyframes glow {
+  0%, 100% { filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.5)); }
+  50% { filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.8)); }
+}
+
+.animate-pulse {
+  animation: glow 2s ease-in-out infinite;
+}
+</style>

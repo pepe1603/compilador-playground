@@ -72,6 +72,15 @@ export class Parser {
   }
 
   private parseStatement(): ASTNode {
+    // Skip comments
+    while (this.check('COMMENT')) {
+      this.advance();
+    }
+
+    if (this.isAtEnd()) {
+      return { type: 'Program', body: [] };
+    }
+
     if (this.match('KEYWORD')) {
       const prev = this.tokens[this.position - 1] ?? { value: '' };
       
