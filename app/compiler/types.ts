@@ -18,6 +18,10 @@ export interface Token {
   column: number;
 }
 
+export interface BaseNode {
+  line?: number;
+}
+
 export type ASTNode =
   | Program
   | VariableDeclaration
@@ -33,77 +37,77 @@ export type ASTNode =
   | Identifier
   | Literal;
 
-export interface Program {
+export interface Program extends BaseNode {
   type: 'Program';
   body: ASTNode[];
 }
 
-export interface VariableDeclaration {
+export interface VariableDeclaration extends BaseNode {
   type: 'VariableDeclaration';
   name: string;
   value: Expression;
 }
 
-export interface FunctionDeclaration {
+export interface FunctionDeclaration extends BaseNode {
   type: 'FunctionDeclaration';
   name: string;
   params: string[];
   body: ASTNode[];
 }
 
-export interface IfStatement {
+export interface IfStatement extends BaseNode {
   type: 'IfStatement';
   condition: Expression;
   consequent: ASTNode[];
   alternate: ASTNode[] | null;
 }
 
-export interface WhileStatement {
+export interface WhileStatement extends BaseNode {
   type: 'WhileStatement';
   condition: Expression;
   body: ASTNode[];
 }
 
-export interface PrintStatement {
+export interface PrintStatement extends BaseNode {
   type: 'PrintStatement';
   argument: Expression;
   newline: boolean;
 }
 
-export interface ReturnStatement {
+export interface ReturnStatement extends BaseNode {
   type: 'ReturnStatement';
   argument: Expression | null;
 }
 
-export interface ExpressionStatement {
+export interface ExpressionStatement extends BaseNode {
   type: 'ExpressionStatement';
   expression: Expression;
 }
 
-export interface BlockStatement {
+export interface BlockStatement extends BaseNode {
   type: 'BlockStatement';
   body: ASTNode[];
 }
 
-export interface BinaryExpression {
+export interface BinaryExpression extends BaseNode {
   type: 'BinaryExpression';
   operator: string;
   left: Expression;
   right: Expression;
 }
 
-export interface UnaryExpression {
+export interface UnaryExpression extends BaseNode {
   type: 'UnaryExpression';
   operator: string;
   argument: Expression;
 }
 
-export interface Identifier {
+export interface Identifier extends BaseNode {
   type: 'Identifier';
   name: string;
 }
 
-export interface Literal {
+export interface Literal extends BaseNode {
   type: 'Literal';
   value: LiteralValue;
 }

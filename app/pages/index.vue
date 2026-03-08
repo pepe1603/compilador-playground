@@ -7,7 +7,7 @@
           <p class="text-gray-400">Aprende cómo funciona un compilador</p>
         </div>
         <div class="flex gap-2">
-          <UBadge color="info" variant="subtle">Fase 2: Parser</UBadge>
+          <UBadge color="info" variant="subtle">Fase 3: Analizador Semántico</UBadge>
         </div>
       </div>
 
@@ -18,12 +18,16 @@
             <CompilerCodeEditor v-model="code" class="h-96" />
           </div>
           
-          <div class="flex gap-2">
-            <UButton color="primary" @click="analyze" :loading="isAnalyzing">
-              Analizar
+          <div class="flex gap-2 flex-wrap">
+            <UButton color="primary" size="lg" @click="run" :loading="isAnalyzing">
+              <UIcon name="i-lucide-play" class="mr-2" />
+              Run
             </UButton>
             <UButton color="neutral" variant="outline" @click="loadExample">
-              Cargar Ejemplo
+              Ejemplo Válido
+            </UButton>
+            <UButton color="error" variant="outline" @click="loadErrorExample">
+              Ejemplo con Error
             </UButton>
           </div>
         </div>
@@ -38,6 +42,9 @@
             <h3 class="text-red-400 font-semibold mb-2">Errores</h3>
             <ul class="space-y-1">
               <li v-for="(error, i) in errors" :key="i" class="text-red-300 text-sm">
+                <UBadge :color="getErrorColor(error.type)" variant="subtle" class="mr-2">
+                  {{ error.type }}
+                </UBadge>
                 Línea {{ error.line }}:{{ error.column }} - {{ error.message }}
               </li>
             </ul>
@@ -61,39 +68,67 @@ const code = ref('')
 const { tokens, errors, ast, analyze: runAnalyze } = useCompiler()
 const isAnalyzing = ref(false)
 
-const analyze = async () => {
+const getErrorColor = (type: string): 'error' | 'warning' | 'info' => {
+  if (type === 'lexical') return 'error'
+  if (type === 'syntactic') return 'warning'
+  return 'error'
+}
+
+const run = async () => {
+  if (!code.value.trim()) {
+    alert('Por favor ingresa código antes de ejecutar')
+    return
+  }
   isAnalyzing.value = true
   await nextTick()
+  await new Promise(resolve => setTimeout(resolve, 50))
   runAnalyze(code.value)
   isAnalyzing.value = false
 }
 
 const loadExample = () => {
-  code.value = `// Ejemplo: Calculadora simple
-crear a = 10
-crear b = 5
-crear suma = a + b
-crear producto = a * b
+  code.value = `// Ejemplo completo del lenguaje
+// ======================================
 
-imprimir("Suma: " + suma)
-imprimir("Producto: " + producto)
+// Saludo básico
+imprimir("Hola Mundo")
 
-si (suma > producto) {
-  imprimir("La suma es mayor")
+// Solicitar nombre y saludar
+crear nombre = "Usuario"
+crear mensaje = "Bienvenido, " + nombre + "!"
+imprimir(mensaje)
+
+// Condicionales
+crear edad = 18
+si (edad >= 18) {
+  imprimir("Eres mayor de edad")
 } sino {
-  imprimir("El producto es mayor")
+  imprimir("Eres menor de edad")
 }
 
-// Comentario de una línea
-crear esMayor = verdadero
-
-// Ejemplo de mientras
-crear contador = 0
-mientras (contador < 3) {
+// Bucles
+cre0
+mientrasar contador =  (contador < 3) {
   imprimir("Contador: " + contador)
   crear contador = contador + 1
 }
 `
-  nextTick(() => analyze())
+  setTimeout(() => run(), 200)
+}
+
+const loadErrorExample = () => {
+  code.value = `// Ejemplo de errores semánticos
+// ======================================
+
+// Error: Variable no declarada
+imprimir(variableNoDeclarada)
+
+// Error: Usar string en condición
+crear nombre = "Juan"
+si (nombre) {
+  imprimir("Esto causará error de tipo")
+}
+`
+  setTimeout(() => run(), 200)
 }
 </script>

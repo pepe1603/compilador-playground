@@ -1,5 +1,6 @@
 import { Lexer } from '~/compiler/lexer'
 import { Parser } from '~/compiler/parser'
+import { SemanticAnalyzer } from '~/compiler/analyzer'
 import type { Token, CompilerError, Program } from '~/compiler/types'
 
 export const useCompiler = () => {
@@ -9,16 +10,24 @@ export const useCompiler = () => {
   const generatedCode = ref<string>('')
 
   const analyze = (code: string) => {
+    errors.value = []
+    
     const lexer = new Lexer(code)
     const lexerResult = lexer.tokenize()
     tokens.value = lexerResult.tokens
-    errors.value = lexerResult.errors
+    errors.value = [...errors.value, ...lexerResult.errors]
 
     if (errors.value.length === 0) {
       const parser = new Parser(tokens.value)
       const parseResult = parser.parse()
       ast.value = parseResult.ast
       errors.value = [...errors.value, ...parseResult.errors]
+    }
+
+    if (errors.value.length === 0 && ast.value) {
+      const analyzer = new SemanticAnalyzer()
+      const semanticErrors = analyzer.analyze(ast.value)
+      errors.value = [...errors.value, ...semanticErrors]
     } else {
       ast.value = null
     }
