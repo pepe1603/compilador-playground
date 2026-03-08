@@ -84,7 +84,6 @@ imprimir("Hola Mundo");`,
   {
     label: 'Ejemplo 2: Variables y Operaciones',
     code: `// Variables y operaciones
-code: \`// Variables y operaciones
 crear a = 10;
 crear b = 5;
 crear suma = a + b;
@@ -95,7 +94,7 @@ crear division = a / b;
 imprimir("Suma: " + suma);
 imprimir("Resta: " + resta);
 imprimir("Producto: " + producto);
-imprimir("Division: " + division);\`,
+imprimir("Division: " + division);
 `,
     open: false
   },
