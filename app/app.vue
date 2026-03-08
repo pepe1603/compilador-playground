@@ -4,7 +4,7 @@ useHead({
     { name: 'viewport', content: 'width=device-width, initial-scale=1' }
   ],
   link: [
-    { rel: 'icon', href: '/favicon.ico' }
+    { rel: 'icon', href: 'https://img.icons8.com/pieces/64/code.png' }
   ],
   htmlAttrs: {
     lang: 'en'
