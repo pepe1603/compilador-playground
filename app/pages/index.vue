@@ -1,25 +1,25 @@
 <template>
   <div class="min-h-screen bg-black flex items-center justify-center relative overflow-hidden">
     <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-purple-900/20 via-black to-black"></div>
-    
+
     <div class="text-center z-10 p-8">
-      <h1 class="text-6xl md:text-8xl font-bold mb-4">
+      <h1 class="text-4xl md:text-8xl font-bold mb-4">
         <span class="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 animate-pulse">
           COMPILADOR
         </span>
       </h1>
-      <h2 class="text-4xl md:text-6xl font-bold mb-8">
+      <h2 class="text-xl md:text-6xl font-bold mb-8">
         <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500">
           PLAYGROUND
         </span>
       </h2>
-      
+
       <p class="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
         Aprende cómo funciona un compilador desde cero
       </p>
-      
-      <div class="flex flex-col md:flex-row gap-4 justify-center">
-        <UButton size="xl" color="primary" variant="solid" @click="$emit('start')">
+
+      <div class="flex flex-col md:flex-row gap-4 justify-center items-center">
+        <UButton size="xl" color="primary" variant="solid" @click="$emit('start')" to="/compiler">
           <UIcon name="i-lucide-code" class="mr-2" />
           Comenzar
         </UButton>
