@@ -4,8 +4,7 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     '@nuxt/ui',
     '@nuxtjs/google-fonts',
-    'nuxt-lucide-icons',
-    'nuxt-monaco-editor'
+    'nuxt-lucide-icons'
   ],
 
   devtools: {
