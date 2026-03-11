@@ -159,57 +159,57 @@ const runCode = async () => {
 
 const examples: Record<string, string> = {
   hola: `// Hola Mundo
-imprimir("Hola Mundo")`,
+imprimir("Hola Mundo");`,
   
   variables: `// Variables y operaciones
-crear a = 10
-crear b = 5
-crear suma = a + b
-crear resta = a - b
-crear producto = a * b
-crear division = a / b
+crear a = 10;
+crear b = 5;
+crear suma = a + b;
+crear resta = a - b;
+crear producto = a * b;
+crear division = a / b;
 
-imprimir("Suma: " + suma)
-imprimir("Resta: " + resta)
-imprimir("Producto: " + producto)
-imprimir("Division: " + division)`,
+imprimir("Suma: " + suma);
+imprimir("Resta: " + resta);
+imprimir("Producto: " + producto);
+imprimir("Division: " + division);`,
   
   condicional: `// Condicional
-crear edad = 18
+crear edad = 18;
 
 si (edad >= 18) {
-  imprimir("Eres mayor de edad")
+  imprimir("Eres mayor de edad");
 } sino {
-  imprimir("Eres menor de edad")
+  imprimir("Eres menor de edad");
 }`,
   
   bucle: `// Bucle mientras
-crear contador = 0
+crear contador = 0;
 mientras (contador < 5) {
-  imprimir("Contador: " + contador)
-  crear contador = contador + 1
+  imprimir("Contador: " + contador);
+  contador = contador + 1;
 }`,
   
   completo: `// Programa completo
-crear nombre = "Juan"
-crear edad = 25
+crear nombre = "Juan";
+crear edad = 25;
 
-imprimir("Bienvenido " + nombre)
-imprimir("Tu edad es: " + edad)
+imprimir("Bienvenido " + nombre);
+imprimir("Tu edad es: " + edad);
 
 si (edad >= 18) {
-  imprimir("Eres mayor de edad")
+  imprimir("Eres mayor de edad");
 } sino {
-  imprimir("Eres menor de edad")
+  imprimir("Eres menor de edad");
 }
 
-crear contador = 0
+crear contador = 0;
 mientras (contador < 3) {
-  imprimir("Iteracion: " + contador)
-  crear contador = contador + 1
+  imprimir("Iteracion: " + contador);
+  contador = contador + 1;
 }
 
-imprimir("Fin del programa")`
+imprimir("Fin del programa");`
 }
 
 const loadExample = (type: string) => {

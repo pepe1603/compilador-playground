@@ -94,8 +94,7 @@ crear division = a / b;
 imprimir("Suma: " + suma);
 imprimir("Resta: " + resta);
 imprimir("Producto: " + producto);
-imprimir("Division: " + division);
-`,
+imprimir("Division: " + division);`,
     open: false
   },
   {
