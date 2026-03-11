@@ -68,6 +68,17 @@
                 </UBadge>
               </UButton>
               <UButton 
+                :color="activeTab === 'tokens' ? 'primary' : 'neutral'" 
+                variant="soft"
+                @click="activeTab = 'tokens'"
+              >
+                <UIcon name="i-lucide-brackets" class="mr-2" />
+                Tokens
+                <UBadge v-if="tokens.length > 0" color="info" variant="solid" class="ml-2">
+                  {{ tokens.length }}
+                </UBadge>
+              </UButton>
+              <UButton 
                 :color="activeTab === 'ast' ? 'primary' : 'neutral'" 
                 variant="soft"
                 @click="activeTab = 'ast'"
@@ -103,6 +114,10 @@
               </div>
             </div>
 
+            <div v-else-if="activeTab === 'tokens'">
+              <CompilerTokenViewer :tokens="tokens" />
+            </div>
+
             <div v-else-if="activeTab === 'ast'">
               <CompilerAstViewer :ast="ast" />
             </div>
@@ -120,9 +135,9 @@
 <script setup lang="ts">
 const code = ref('')
 
-const { errors, ast, output, run: runCompiler } = useCompiler()
+const { tokens, errors, ast, output, run: runCompiler } = useCompiler()
 const isRunning = ref(false)
-const activeTab = ref<'errores' | 'ast' | 'ayuda'>('ayuda')
+const activeTab = ref<'errores' | 'tokens' | 'ast' | 'ayuda'>('ayuda')
 
 const getErrorColor = (type: string): 'error' | 'warning' | 'info' => {
   if (type === 'lexical') return 'error'
