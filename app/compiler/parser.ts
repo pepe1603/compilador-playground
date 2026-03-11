@@ -298,7 +298,8 @@ export class Parser {
   private parseAdditive(): Expression {
     let left = this.parseMultiplicative();
 
-    while (this.match('OPERATOR') && ['+', '-'].includes((this.tokens[this.position - 1] ?? { value: '' }).value)) {
+    while (this.check('OPERATOR') && ['+', '-'].includes(this.current().value)) {
+      this.advance();
       const operator = (this.tokens[this.position - 1] ?? { value: '' }).value;
       const right = this.parseMultiplicative();
       left = { type: 'BinaryExpression', operator, left, right };
@@ -310,7 +311,8 @@ export class Parser {
   private parseMultiplicative(): Expression {
     let left = this.parseUnary();
 
-    while (this.match('OPERATOR') && ['*', '/'].includes((this.tokens[this.position - 1] ?? { value: '' }).value)) {
+    while (this.check('OPERATOR') && ['*', '/'].includes(this.current().value)) {
+      this.advance();
       const operator = (this.tokens[this.position - 1] ?? { value: '' }).value;
       const right = this.parseUnary();
       left = { type: 'BinaryExpression', operator, left, right };
