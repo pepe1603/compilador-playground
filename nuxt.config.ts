@@ -13,8 +13,16 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
+  vite: {
+    optimizeDeps: {
+      include: ['monaco-editor']
+    }
+  },
+
   routeRules: {
-    '/': { ssr: false }
+    '/': { ssr: false },
+    '/compiler': { ssr: false },
+    '/docs': { ssr: false }
   },
 
   compatibilityDate: '2025-01-15',
