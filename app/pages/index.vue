@@ -23,6 +23,10 @@
           <UIcon name="i-lucide-code" class="mr-2" />
           Comenzar
         </UButton>
+        <UButton size="xl" color="secondary" variant="outline" to="/docs">
+          <UIcon name="i-lucide-book-open" class="mr-2" />
+          Docs
+        </UButton>
         <UButton size="xl" color="neutral" variant="outline" to="https://github.com/pepe1603/compilador-playground" target="_blank">
           <UIcon name="i-simple-icons-github" class="mr-2" />
           GitHub
